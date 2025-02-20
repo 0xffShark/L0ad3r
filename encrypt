@@ -1,0 +1,31 @@
+Encryption
+#!/bin/bash
+
+folder_to_encrypt="$1"
+
+encrypted_folder="$1"
+
+aes_key="923cbfc4286c56ccf3472427dfdbe8c7c3804716fe8f6696b58add54c7035360923cbfc4286c56ccf3472427dfdbe8c7c3804716fe8f6696b58add54c7035360"
+
+find "$folder_to_encrypt" -type f -print0 | while IFS= read -r -d '' file; do
+    openssl enc -aes-256-cbc -salt -in "$file" -out "$encrypted_folder/${file#$folder_to_encrypt}.enc" -pass "pass:$aes_key"
+
+    rm "$file"
+Done
+
+decryiption:
+#!/bin/bash
+
+encrypted_folder="$1"
+
+decrypted_folder="$1"
+
+aes_key="923cbfc4286c56ccf3472427dfdbe8c7c3804716fe8f6696b58add54c7035360923cbfc4286c56ccf3472427dfdbe8c7c3804716fe8f6696b58add54c7035360
+
+find "$encrypted_folder" -type f -name "*.enc" -print0 | while IFS= read -r -d '' file; do
+    decrypted_file="$decrypted_folder/${file#$encrypted_folder}"
+    decrypted_file="${decrypted_file%.enc}"
+    openssl enc -aes-256-cbc -d -in "$file" -out "$decrypted_file" -pass "pass:$aes_key"
+
+    rm "$file"
+done
